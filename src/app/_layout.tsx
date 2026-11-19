@@ -7,6 +7,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { DatabaseProvider } from '@/core/db/DatabaseProvider';
 import { usePalette, useScheme } from '@/core/ui/theme';
+import { fonts } from '@/core/ui/tokens';
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({
@@ -26,8 +27,21 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <DatabaseProvider>
-        <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: p.ground } }}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+            contentStyle: { backgroundColor: p.ground },
+            headerStyle: { backgroundColor: p.ground },
+            headerTintColor: p.primary,
+            headerShadowVisible: false,
+            headerTitleStyle: { fontFamily: fonts.displayBold, color: p.ink },
+            headerBackButtonDisplayMode: 'minimal',
+          }}
+        >
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="pet/new" options={{ headerShown: true, title: 'Add pet' }} />
+          <Stack.Screen name="pet/[id]/index" options={{ headerShown: true, title: '' }} />
+          <Stack.Screen name="pet/[id]/edit" options={{ headerShown: true, title: 'Edit pet' }} />
           <Stack.Screen
             name="add"
             options={{
