@@ -1,7 +1,7 @@
 import type { ColorValue } from 'react-native';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 
-export type IconName = 'home' | 'paw' | 'calendar' | 'settings' | 'plus' | 'syringe' | 'bell' | 'stethoscope' | 'check';
+export type IconName = 'home' | 'paw' | 'calendar' | 'settings' | 'plus' | 'syringe' | 'bell' | 'stethoscope' | 'check' | 'document';
 
 export interface IconProps {
   name: IconName;
@@ -41,6 +41,7 @@ export function Icon({ name, size = 24, color }: IconProps) {
       {name === 'bell' && <Path d="M6 16V11a6 6 0 0 1 12 0v5l2 2H4zM10 21h4" {...stroke} />}
       {name === 'stethoscope' && <Path d="M6 3v6a5 5 0 0 0 10 0V3M11 14v2a4 4 0 0 0 8 0v-2M19 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4z" {...stroke} />}
       {name === 'check' && <Path d="M5 12.5l4.5 4.5L19 7.5" {...stroke} />}
+      {name === 'document' && <Path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8zM14 3v5h5M9 13h6M9 17h4" {...stroke} />}
     </Svg>
   );
 }

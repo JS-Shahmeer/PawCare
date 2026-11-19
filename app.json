@@ -37,8 +37,8 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "PawCare uses your photos only when you choose a picture for a pet profile.",
-          "cameraPermission": false,
+          "photosPermission": "PawCare uses your photos only when you choose a picture for a pet profile or document.",
+          "cameraPermission": "PawCare uses the camera only when you take a photo of a pet document.",
           "microphonePermission": false
         }
       ]

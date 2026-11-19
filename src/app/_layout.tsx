@@ -48,6 +48,10 @@ export default function RootLayout() {
           <Stack.Screen name="care/[id]/index" options={{ headerShown: true, title: '' }} />
           <Stack.Screen name="care/[id]/edit" options={{ headerShown: true, title: 'Edit reminder' }} />
           <Stack.Screen name="care/[id]/reschedule" options={{ headerShown: true, title: 'Reschedule' }} />
+          <Stack.Screen name="vaccination/new" options={{ headerShown: true, title: 'Add vaccination' }} />
+          <Stack.Screen name="vaccination/[id]" options={{ headerShown: true, title: 'Vaccination' }} />
+          <Stack.Screen name="document/new" options={{ headerShown: true, title: 'Add document' }} />
+          <Stack.Screen name="document/[id]" options={{ headerShown: true, title: 'Document' }} />
           <Stack.Screen
             name="add"
             options={{

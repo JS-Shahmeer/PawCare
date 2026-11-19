@@ -9,6 +9,11 @@ import { usePalette } from '@/core/ui/theme';
 import { radius, spacing } from '@/core/ui/tokens';
 import { CareEventRow } from '@/features/care/components/CareEventRow';
 import { useCareEventsForPet } from '@/features/care/repo';
+import { DocumentRow } from '@/features/documents/components/DocumentRow';
+import { useDocumentsForPet } from '@/features/documents/repo';
+import { VaccinationRow } from '@/features/vaccinations/components/VaccinationRow';
+import { useVaccinationsForPet } from '@/features/vaccinations/repo';
+import { todayIso } from '@/lib/dates';
 import { ageText, deleteImpactMessage, petSubtitle } from '@/features/pets/logic/describePet';
 import { deletePet, getDeleteImpact, usePet } from '@/features/pets/repo';
 
@@ -30,7 +35,10 @@ export default function PetDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { pet, loaded } = usePet(id);
   const care = useCareEventsForPet(id);
+  const vax = useVaccinationsForPet(id);
+  const docs = useDocumentsForPet(id);
   const [now] = useState(() => Date.now());
+  const [today] = useState(() => todayIso());
   const p = usePalette();
 
   if (!loaded) return null;
@@ -92,6 +100,18 @@ export default function PetDetailScreen() {
 
         <View style={styles.section}>
           <Text variant="title" accessibilityRole="header">
+            Vaccinations
+          </Text>
+          {vax.loaded && vax.vaccinations.length === 0 ? (
+            <Text tone="muted">No vaccination records yet. Add vaccines from your vet&apos;s records.</Text>
+          ) : (
+            vax.vaccinations.map((v) => <VaccinationRow key={v.id} vaccination={v} today={today} />)
+          )}
+          <Button label="Add vaccination" variant="secondary" onPress={() => router.push({ pathname: '/vaccination/new', params: { petId: pet.id } })} />
+        </View>
+
+        <View style={styles.section}>
+          <Text variant="title" accessibilityRole="header">
             Care and visits
           </Text>
           {care.loaded && care.events.length === 0 ? (
@@ -103,6 +123,18 @@ export default function PetDetailScreen() {
             <Button style={styles.flex} label="Add reminder" variant="secondary" onPress={() => router.push({ pathname: '/care/new', params: { petId: pet.id } })} />
             <Button style={styles.flex} label="Add vet visit" variant="secondary" onPress={() => router.push({ pathname: '/care/new', params: { petId: pet.id, type: 'vet_visit' } })} />
           </View>
+        </View>
+
+        <View style={styles.section}>
+          <Text variant="title" accessibilityRole="header">
+            Documents
+          </Text>
+          {docs.loaded && docs.documents.length === 0 ? (
+            <Text tone="muted">Keep certificates, lab results and receipts here. They stay on this phone.</Text>
+          ) : (
+            docs.documents.map((d) => <DocumentRow key={d.id} doc={d} />)
+          )}
+          <Button label="Add document" variant="secondary" onPress={() => router.push({ pathname: '/document/new', params: { petId: pet.id } })} />
         </View>
 
         <Button label="Edit profile" variant="secondary" onPress={() => router.push({ pathname: '/pet/[id]/edit', params: { id: pet.id } })} />

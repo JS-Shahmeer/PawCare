@@ -44,3 +44,17 @@ export function deleteStoredFile(relativePath: string | null | undefined): void 
   const file = new File(Paths.document, relativePath);
   if (file.exists) file.delete();
 }
+
+/** Reads a picked file's real size and first bytes, to validate it before copying. */
+export function inspectFile(uri: string, headLength = 8): { size: number; head: Uint8Array } {
+  const file = new File(uri);
+  if (!file.exists) throw new Error('File is no longer available');
+  const handle = file.open();
+  try {
+    const size = handle.size ?? file.size ?? 0;
+    const head = size > 0 ? handle.readBytesSync(Math.min(headLength, size)) : new Uint8Array();
+    return { size, head };
+  } finally {
+    handle.close();
+  }
+}

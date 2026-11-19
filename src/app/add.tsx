@@ -7,15 +7,12 @@ import { radius, spacing } from '@/core/ui/tokens';
 
 const OPTIONS: { icon: IconName; label: string; hint: string; href?: Href }[] = [
   { icon: 'paw', label: 'Pet', hint: 'Profile, photo and notes', href: '/pet/new' },
-  { icon: 'syringe', label: 'Vaccination', hint: 'A vaccine your pet already had' },
+  { icon: 'syringe', label: 'Vaccination', hint: 'A vaccine your pet already had', href: '/vaccination/new' },
   { icon: 'bell', label: 'Care reminder', hint: 'Grooming, medication, flea and tick', href: '/care/new' },
   { icon: 'stethoscope', label: 'Vet visit', hint: 'An upcoming appointment', href: { pathname: '/care/new', params: { type: 'vet_visit' } } },
 ];
 
-/**
- * Global Add sheet. Options whose feature module is not built yet are shown as
- * unavailable rather than as active controls (brief 01).
- */
+/** Global Add sheet (brief 01). Options without an href are shown as coming soon. */
 export default function AddSheet() {
   const p = usePalette();
   return (
