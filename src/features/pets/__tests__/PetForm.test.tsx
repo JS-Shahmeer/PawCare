@@ -2,6 +2,9 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react-nativ
 
 import { PetForm } from '../components/PetForm';
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+jest.mock('@/core/ui/components/DateTimeField', () => require('@/test/mockDateTimeField'));
+
 describe('PetForm', () => {
   it('shows inline errors and does not submit when required fields are missing', async () => {
     const onSubmit = jest.fn();

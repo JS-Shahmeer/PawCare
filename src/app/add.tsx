@@ -8,8 +8,8 @@ import { radius, spacing } from '@/core/ui/tokens';
 const OPTIONS: { icon: IconName; label: string; hint: string; href?: Href }[] = [
   { icon: 'paw', label: 'Pet', hint: 'Profile, photo and notes', href: '/pet/new' },
   { icon: 'syringe', label: 'Vaccination', hint: 'A vaccine your pet already had' },
-  { icon: 'bell', label: 'Care reminder', hint: 'Grooming, medication, flea and tick' },
-  { icon: 'stethoscope', label: 'Vet visit', hint: 'An upcoming appointment' },
+  { icon: 'bell', label: 'Care reminder', hint: 'Grooming, medication, flea and tick', href: '/care/new' },
+  { icon: 'stethoscope', label: 'Vet visit', hint: 'An upcoming appointment', href: { pathname: '/care/new', params: { type: 'vet_visit' } } },
 ];
 
 /**

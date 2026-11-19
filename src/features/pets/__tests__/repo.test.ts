@@ -14,6 +14,7 @@ const mockFiles = {
 let mockDb: ReturnType<typeof createTestDb>['db'];
 let sqlite: DatabaseSync;
 let mockIdCounter = 0;
+const mockRebuild = jest.fn().mockResolvedValue(undefined);
 
 jest.mock('@/core/db/client', () => ({
   get db() {
@@ -24,6 +25,7 @@ jest.mock('@/core/files/storage', () => ({
   importFile: (...a: unknown[]) => mockFiles.importFile(...a),
   deleteStoredFile: (...a: unknown[]) => mockFiles.deleteStoredFile(...a),
 }));
+jest.mock('@/core/notifications/alerts', () => ({ rebuildAlerts: (...a: unknown[]) => mockRebuild(...a) }));
 jest.mock('@/lib/id', () => ({ newId: () => `id-${++mockIdCounter}` }));
 jest.mock('drizzle-orm/expo-sqlite', () => ({ useLiveQuery: jest.fn() }));
 
@@ -104,6 +106,7 @@ describe('pets repository', () => {
     expect(petRow(b)).toBeDefined();
     expect(getDeleteImpact(b)).toEqual({ vaccinations: 1, careEvents: 0, documents: 1 });
     expect(mockFiles.deleteStoredFile.mock.calls.map((c) => c[0])).toEqual(['pet-photos/a.jpg', `documents/${a}.pdf`]);
+    expect(mockRebuild).toHaveBeenCalled();
   });
 
   it('still deletes the record if a file cannot be removed', async () => {

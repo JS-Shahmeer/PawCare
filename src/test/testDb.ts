@@ -58,16 +58,22 @@ export function createTestDb() {
   const sqlite = openMigratedSqlite();
   const client = {
     prepare: (sql: string) => new StatementAdapter(sqlite, sql),
-    transaction: <T>(fn: () => T) => () => {
-      sqlite.exec('BEGIN');
-      try {
-        const result = fn();
-        sqlite.exec('COMMIT');
-        return result;
-      } catch (e) {
-        sqlite.exec('ROLLBACK');
-        throw e;
-      }
+    // Mirrors better-sqlite3: transaction(fn) returns a function with .deferred/.immediate/.exclusive.
+    transaction: <A extends unknown[], T>(fn: (...args: A) => T) => {
+      const run =
+        (mode: string) =>
+        (...args: A): T => {
+          sqlite.exec(`BEGIN ${mode}`);
+          try {
+            const result = fn(...args);
+            sqlite.exec('COMMIT');
+            return result;
+          } catch (e) {
+            sqlite.exec('ROLLBACK');
+            throw e;
+          }
+        };
+      return Object.assign(run('DEFERRED'), { deferred: run('DEFERRED'), immediate: run('IMMEDIATE'), exclusive: run('EXCLUSIVE') });
     },
   };
   return { db: drizzle({ client: client as any, schema }), sqlite };

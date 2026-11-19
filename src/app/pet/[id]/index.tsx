@@ -1,4 +1,5 @@
 import { router, Stack, useLocalSearchParams } from 'expo-router';
+import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -6,6 +7,8 @@ import { resolveStoredUri } from '@/core/files/storage';
 import { Avatar, Button, Card, EmptyState, Text } from '@/core/ui/components';
 import { usePalette } from '@/core/ui/theme';
 import { radius, spacing } from '@/core/ui/tokens';
+import { CareEventRow } from '@/features/care/components/CareEventRow';
+import { useCareEventsForPet } from '@/features/care/repo';
 import { ageText, deleteImpactMessage, petSubtitle } from '@/features/pets/logic/describePet';
 import { deletePet, getDeleteImpact, usePet } from '@/features/pets/repo';
 
@@ -26,6 +29,8 @@ function Fact({ label, value }: { label: string; value: string | null }) {
 export default function PetDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { pet, loaded } = usePet(id);
+  const care = useCareEventsForPet(id);
+  const [now] = useState(() => Date.now());
   const p = usePalette();
 
   if (!loaded) return null;
@@ -85,6 +90,21 @@ export default function PetDetailScreen() {
           <Fact label="Notes" value={pet.notes} />
         </Card>
 
+        <View style={styles.section}>
+          <Text variant="title" accessibilityRole="header">
+            Care and visits
+          </Text>
+          {care.loaded && care.events.length === 0 ? (
+            <Text tone="muted">No reminders yet. Add grooming, medication, flea and tick care or a vet visit.</Text>
+          ) : (
+            care.events.map((e) => <CareEventRow key={e.id} event={e} overrides={care.overrides.filter((o) => o.eventId === e.id)} now={now} />)
+          )}
+          <View style={styles.actions}>
+            <Button style={styles.flex} label="Add reminder" variant="secondary" onPress={() => router.push({ pathname: '/care/new', params: { petId: pet.id } })} />
+            <Button style={styles.flex} label="Add vet visit" variant="secondary" onPress={() => router.push({ pathname: '/care/new', params: { petId: pet.id, type: 'vet_visit' } })} />
+          </View>
+        </View>
+
         <Button label="Edit profile" variant="secondary" onPress={() => router.push({ pathname: '/pet/[id]/edit', params: { id: pet.id } })} />
         <Button label={`Delete ${pet.name}`} variant="destructive" onPress={confirmDelete} />
       </ScrollView>
@@ -99,4 +119,7 @@ const styles = StyleSheet.create({
   heroText: { flex: 1, gap: 4 },
   card: { gap: spacing.md },
   fact: { gap: 2 },
+  section: { gap: spacing.sm + 2 },
+  actions: { flexDirection: 'row', gap: spacing.sm },
+  flex: { flex: 1 },
 });

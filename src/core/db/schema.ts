@@ -21,13 +21,17 @@ export type CareEventType = (typeof CARE_EVENT_TYPES)[number];
 export const OCCURRENCE_STATES = ['completed', 'skipped', 'rescheduled'] as const;
 export type OccurrenceState = (typeof OCCURRENCE_STATES)[number];
 
-/** Repeat rule stored as JSON on a care event (PC-04). */
-export type RecurrenceRule =
+/**
+ * Repeat rule stored as JSON on a care event (PC-04). `until` is the last local date
+ * (inclusive) a series may occur on; "delete this and future" sets it.
+ */
+export type RecurrenceRule = (
   | { kind: 'none' }
   | { kind: 'daily' }
   | { kind: 'weekly' }
   | { kind: 'monthly' }
-  | { kind: 'interval'; days: number };
+  | { kind: 'interval'; days: number }
+) & { until?: string | null };
 
 const timestamps = {
   createdAt: integer('created_at', { mode: 'number' })
