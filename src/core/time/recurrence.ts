@@ -148,9 +148,17 @@ export function occurrencesInRange(series: SeriesInput, overrides: OverrideInput
  * Scheduling status at `now` (R05). Overdue means the due time passed without completion;
  * it is never a medical classification.
  */
-export function occurrenceStatus(o: Pick<Occurrence, 'dueAt' | 'completed'>, now: number, dueSoonDays: number): OccurrenceStatus {
+export function occurrenceStatus(
+  o: Pick<Occurrence, 'dueAt' | 'completed'> & { local?: string },
+  now: number,
+  dueSoonDays: number,
+  /** Local date at `now`. When given with `o.local`, "due soon" counts calendar days, so a
+   * task three days away is due soon all day today, matching vaccination due dates. */
+  today?: string,
+): OccurrenceStatus {
   if (o.completed) return 'completed';
   if (o.dueAt <= now) return 'overdue';
+  if (today && o.local) return splitDateTime(o.local).date <= addDays(today, dueSoonDays) ? 'dueSoon' : 'upcoming';
   if (o.dueAt - now <= dueSoonDays * 86_400_000) return 'dueSoon';
   return 'upcoming';
 }

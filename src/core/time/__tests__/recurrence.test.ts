@@ -185,3 +185,15 @@ describe('repeatLabel', () => {
     expect(repeatLabel({ kind: 'weekly' })).toBe('Every week');
   });
 });
+
+describe('occurrenceStatus by calendar day', () => {
+  it('counts due soon in whole days when today is given', () => {
+    const TZ2 = 'Asia/Karachi';
+    const now = toInstant('2026-11-19T12:00', TZ2);
+    const o = (local: string) => ({ local, dueAt: toInstant(local, TZ2) + 86_400_000, completed: false });
+    expect(occurrenceStatus(o('2026-11-22T00:00'), now, 3, '2026-11-19')).toBe('dueSoon');
+    expect(occurrenceStatus(o('2026-11-23T00:00'), now, 3, '2026-11-19')).toBe('upcoming');
+    // Without today the older instant-based rule still applies.
+    expect(occurrenceStatus(o('2026-11-22T00:00'), now, 3)).toBe('upcoming');
+  });
+});

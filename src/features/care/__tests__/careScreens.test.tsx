@@ -21,6 +21,7 @@ const mockRepo = {
   complete: jest.fn().mockResolvedValue(undefined),
   undo: jest.fn().mockResolvedValue(undefined),
 };
+jest.mock('@/core/settings/settings', () => ({ useSettings: () => ({ dueSoonDays: 3, defaultAlert: '0', loaded: true }) }));
 jest.mock('../repo', () => ({
   useCareEvent: () => ({ event: mockRepo.event, petName: 'Bella', overrides: mockRepo.overrides, loaded: true }),
   completeOccurrence: (...a: unknown[]) => mockRepo.complete(...a),
@@ -60,14 +61,14 @@ afterEach(() => jest.restoreAllMocks());
 
 describe('CareEventRow', () => {
   it('keeps missed occurrences visible with an overdue status', async () => {
-    await render(<CareEventRow event={event()} overrides={[]} now={NOW} />);
+    await render(<CareEventRow event={event()} overrides={[]} now={NOW} dueSoonDays={3} />);
     expect(screen.getByText('Overdue')).toBeTruthy();
     expect(screen.getByText(/2 missed/)).toBeTruthy();
   });
 
   it('shows the next occurrence once the missed ones are done and opens the detail on press', async () => {
     const done = (key: string) => ({ id: key, eventId: 'e1', occurrenceKey: key, state: 'completed' as const, completedAt: NOW, revisedAt: null });
-    await render(<CareEventRow event={event()} overrides={[done('2026-11-17'), done('2026-11-18')]} now={NOW} />);
+    await render(<CareEventRow event={event()} overrides={[done('2026-11-17'), done('2026-11-18')]} now={NOW} dueSoonDays={3} />);
     expect(screen.queryByText('Overdue')).toBeNull();
     expect(screen.getByText('Due soon')).toBeTruthy();
     await fireEvent.press(screen.getByRole('button'));
