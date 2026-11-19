@@ -5,7 +5,8 @@ import * as schema from './schema';
 
 export const DATABASE_NAME = 'pawcare.db';
 
-const sqlite = openDatabaseSync(DATABASE_NAME);
+// Change listener powers Drizzle's useLiveQuery so screens update after every write.
+const sqlite = openDatabaseSync(DATABASE_NAME, { enableChangeListener: true });
 // SQLite leaves foreign keys off by default; cascades and orphan protection depend on this.
 sqlite.execSync('PRAGMA foreign_keys = ON;');
 
