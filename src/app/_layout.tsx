@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { DatabaseProvider } from '@/core/db/DatabaseProvider';
+import { AlertsBootstrap } from '@/core/notifications/AlertsBootstrap';
 import { usePalette, useScheme } from '@/core/ui/theme';
 import { fonts } from '@/core/ui/tokens';
 
@@ -27,6 +28,7 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
       <DatabaseProvider>
+        <AlertsBootstrap />
         <Stack
           screenOptions={{
             headerShown: false,
@@ -42,6 +44,10 @@ export default function RootLayout() {
           <Stack.Screen name="pet/new" options={{ headerShown: true, title: 'Add pet' }} />
           <Stack.Screen name="pet/[id]/index" options={{ headerShown: true, title: '' }} />
           <Stack.Screen name="pet/[id]/edit" options={{ headerShown: true, title: 'Edit pet' }} />
+          <Stack.Screen name="care/new" options={{ headerShown: true, title: 'New reminder' }} />
+          <Stack.Screen name="care/[id]/index" options={{ headerShown: true, title: '' }} />
+          <Stack.Screen name="care/[id]/edit" options={{ headerShown: true, title: 'Edit reminder' }} />
+          <Stack.Screen name="care/[id]/reschedule" options={{ headerShown: true, title: 'Reschedule' }} />
           <Stack.Screen
             name="add"
             options={{

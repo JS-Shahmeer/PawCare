@@ -29,6 +29,12 @@
       "expo-sqlite",
       "expo-font",
       [
+        "expo-notifications",
+        {
+          "color": "#0F766E"
+        }
+      ],
+      [
         "expo-image-picker",
         {
           "photosPermission": "PawCare uses your photos only when you choose a picture for a pet profile.",

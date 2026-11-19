@@ -3,11 +3,13 @@ import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Pressable, StyleSheet, View } from 'react-native';
 
-import { Avatar, Button, ChoiceChips, Text, TextField } from '@/core/ui/components';
+import { Avatar, Button, ChoiceChips, DateTimeField, Text, TextField } from '@/core/ui/components';
 import { usePalette } from '@/core/ui/theme';
 import { spacing } from '@/core/ui/tokens';
 
 import { pickPetPhoto } from '../logic/pickPhoto';
+import { formatDay } from '@/lib/format';
+
 import { NOTES_MAX, petInputSchema, type PetFormValues, type PetInput } from '../logic/petSchema';
 import type { PhotoChange } from '../repo';
 
@@ -147,16 +149,21 @@ export function PetForm({ initialValues, initialPhotoUri = null, submitLabel, on
         control={control}
         name="birthDate"
         render={({ field }) => (
-          <TextField
-            label="Birth date"
-            optional
-            placeholder="YYYY-MM-DD"
-            value={field.value ?? ''}
-            onChangeText={field.onChange}
-            error={errors.birthDate?.message}
-            keyboardType="numbers-and-punctuation"
-            maxLength={10}
-          />
+          <View style={styles.dateRow}>
+            <View style={styles.dateField}>
+              <DateTimeField
+                label="Birth date"
+                mode="date"
+                optional
+                value={field.value || null}
+                onChange={field.onChange}
+                format={(v) => formatDay(v)}
+                maximumDate={new Date()}
+                error={errors.birthDate?.message}
+              />
+            </View>
+            {field.value ? <Button label="Clear" variant="ghost" onPress={() => field.onChange('')} /> : null}
+          </View>
         )}
       />
 
@@ -219,4 +226,6 @@ const styles = StyleSheet.create({
   photoRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.lg },
   photoActions: { flex: 1, gap: spacing.sm },
   errorBox: { padding: spacing.md, borderRadius: 12 },
+  dateRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm },
+  dateField: { flex: 1 },
 });

@@ -8,6 +8,7 @@ import { useLiveQuery } from 'drizzle-orm/expo-sqlite';
 import { db } from '@/core/db/client';
 import { careEvents, documents, pets, vaccinations, type Pet } from '@/core/db/schema';
 import { deleteStoredFile, importFile } from '@/core/files/storage';
+import { rebuildAlerts } from '@/core/notifications/alerts';
 import { newId } from '@/lib/id';
 
 import type { DeleteImpact } from './logic/describePet';
@@ -88,7 +89,8 @@ export function deletePet(id: string): void {
 
   db.delete(pets).where(eq(pets.id, id)).run();
 
-  // TODO(F4 notifications): cancel this pet's scheduled OS alerts here once alerts exist.
+  // The pet's events are gone, so a rebuild drops their scheduled OS alerts (PC-08).
+  void rebuildAlerts();
   for (const path of [pet.photoPath, ...files]) {
     try {
       deleteStoredFile(path);
