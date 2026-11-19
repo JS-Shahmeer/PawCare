@@ -6,14 +6,16 @@ import { EmptyState, FormScreen } from '@/core/ui/components';
 import { CareForm } from '@/features/care/components/CareForm';
 import { createCareEvent } from '@/features/care/repo';
 import { usePets } from '@/features/pets/repo';
+import { useSettings } from '@/core/settings/settings';
 import { isValidIsoDate } from '@/lib/dates';
 
 export default function NewCareScreen() {
   const params = useLocalSearchParams<{ petId?: string; type?: string; title?: string; date?: string }>();
   const { data: pets, updatedAt } = usePets();
+  const { defaultAlert, loaded: settingsLoaded } = useSettings();
   const type = CARE_EVENT_TYPES.includes(params.type as CareEventType) ? (params.type as CareEventType) : undefined;
 
-  if (updatedAt === undefined) return null;
+  if (updatedAt === undefined || !settingsLoaded) return null;
   if (pets.length === 0) {
     return (
       <FormScreen>
@@ -27,6 +29,7 @@ export default function NewCareScreen() {
       <CareForm
         pets={pets.map((x) => ({ id: x.id, name: x.name }))}
         initialValues={{
+          alert: defaultAlert,
           ...(type ? { type } : {}),
           ...(params.petId ? { petId: params.petId } : {}),
           ...(params.title ? { title: params.title.slice(0, 60) } : {}),

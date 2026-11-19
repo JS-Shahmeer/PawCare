@@ -5,14 +5,13 @@ import type { Vaccination } from '@/core/db/schema';
 import { Icon, StatusPill, Text } from '@/core/ui/components';
 import { usePalette } from '@/core/ui/theme';
 import { radius, spacing } from '@/core/ui/tokens';
-import { DUE_SOON_DAYS } from '@/features/care/logic/constants';
 import { formatDay } from '@/lib/format';
 
 import { nextDueStatus } from '../logic/vaccinationSchema';
 
-export function VaccinationRow({ vaccination: v, today }: { vaccination: Vaccination; today: string }) {
+export function VaccinationRow({ vaccination: v, today, dueSoonDays }: { vaccination: Vaccination; today: string; dueSoonDays: number }) {
   const p = usePalette();
-  const status = nextDueStatus(v.nextDueOn, today, DUE_SOON_DAYS);
+  const status = nextDueStatus(v.nextDueOn, today, dueSoonDays);
   const detail = `Given ${formatDay(v.administeredOn)}${v.nextDueOn ? ` · next due ${formatDay(v.nextDueOn)}` : ''}`;
   return (
     <Pressable

@@ -9,7 +9,7 @@ import { addDays, localDateAt } from '@/core/time/localDateTime';
 import { Button, Card, EmptyState, Icon, StatusPill, Text } from '@/core/ui/components';
 import { usePalette } from '@/core/ui/theme';
 import { radius, spacing } from '@/core/ui/tokens';
-import { DUE_SOON_DAYS } from '@/features/care/logic/constants';
+import { useSettings } from '@/core/settings/settings';
 import { ALERT_CHOICES, TYPE_LABELS } from '@/features/care/logic/careSchema';
 import {
   completeOccurrence,
@@ -33,6 +33,7 @@ export default function CareDetailScreen() {
   const { event, petName, overrides, loaded } = useCareEvent(id);
   const p = usePalette();
   const [now] = useState(() => Date.now());
+  const { dueSoonDays } = useSettings();
 
   const list = useMemo(() => {
     if (!event) return { overdue: [], upcoming: [], done: [] as Occurrence[] };
@@ -118,7 +119,7 @@ export default function CareDetailScreen() {
         {list.overdue.length > 0 ? (
           <Section title="Missed">
             {list.overdue.map((o) => (
-              <OccurrenceRow key={o.key} o={o} now={now} onToggle={() => safely(() => completeOccurrence(ev.id, o.key))} onMore={() => occurrenceMenu(o)} />
+              <OccurrenceRow key={o.key} o={o} now={now} today={localDateAt(now, ev.timezoneId)} dueSoonDays={dueSoonDays} onToggle={() => safely(() => completeOccurrence(ev.id, o.key))} onMore={() => occurrenceMenu(o)} />
             ))}
           </Section>
         ) : null}
@@ -128,7 +129,7 @@ export default function CareDetailScreen() {
             <Text tone="muted">Nothing else scheduled.</Text>
           ) : (
             list.upcoming.map((o) => (
-              <OccurrenceRow key={o.key} o={o} now={now} onToggle={() => safely(() => completeOccurrence(ev.id, o.key))} onMore={() => occurrenceMenu(o)} />
+              <OccurrenceRow key={o.key} o={o} now={now} today={localDateAt(now, ev.timezoneId)} dueSoonDays={dueSoonDays} onToggle={() => safely(() => completeOccurrence(ev.id, o.key))} onMore={() => occurrenceMenu(o)} />
             ))
           )}
         </Section>
@@ -136,7 +137,7 @@ export default function CareDetailScreen() {
         {list.done.length > 0 ? (
           <Section title="Done recently">
             {list.done.map((o) => (
-              <OccurrenceRow key={o.key} o={o} now={now} onToggle={() => safely(() => undoCompleteOccurrence(ev.id, o.key))} />
+              <OccurrenceRow key={o.key} o={o} now={now} today={localDateAt(now, ev.timezoneId)} dueSoonDays={dueSoonDays} onToggle={() => safely(() => undoCompleteOccurrence(ev.id, o.key))} />
             ))}
           </Section>
         ) : null}
@@ -166,9 +167,9 @@ function Section({ title, children }: { title: string; children: React.ReactNode
   );
 }
 
-function OccurrenceRow({ o, now, onToggle, onMore }: { o: Occurrence; now: number; onToggle: () => void; onMore?: () => void }) {
+function OccurrenceRow({ o, now, today, dueSoonDays, onToggle, onMore }: { o: Occurrence; now: number; today: string; dueSoonDays: number; onToggle: () => void; onMore?: () => void }) {
   const p = usePalette();
-  const status = occurrenceStatus(o, now, DUE_SOON_DAYS);
+  const status = occurrenceStatus(o, now, dueSoonDays, today);
   const when = formatOccurrence(o.local, o.hasExplicitTime);
   return (
     <View style={[styles.occ, { backgroundColor: p.surface, borderColor: p.border }]}>

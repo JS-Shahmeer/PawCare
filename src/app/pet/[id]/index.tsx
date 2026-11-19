@@ -14,6 +14,7 @@ import { useDocumentsForPet } from '@/features/documents/repo';
 import { VaccinationRow } from '@/features/vaccinations/components/VaccinationRow';
 import { useVaccinationsForPet } from '@/features/vaccinations/repo';
 import { todayIso } from '@/lib/dates';
+import { useSettings } from '@/core/settings/settings';
 import { ageText, deleteImpactMessage, petSubtitle } from '@/features/pets/logic/describePet';
 import { deletePet, getDeleteImpact, usePet } from '@/features/pets/repo';
 
@@ -39,6 +40,7 @@ export default function PetDetailScreen() {
   const docs = useDocumentsForPet(id);
   const [now] = useState(() => Date.now());
   const [today] = useState(() => todayIso());
+  const { dueSoonDays } = useSettings();
   const p = usePalette();
 
   if (!loaded) return null;
@@ -105,7 +107,7 @@ export default function PetDetailScreen() {
           {vax.loaded && vax.vaccinations.length === 0 ? (
             <Text tone="muted">No vaccination records yet. Add vaccines from your vet&apos;s records.</Text>
           ) : (
-            vax.vaccinations.map((v) => <VaccinationRow key={v.id} vaccination={v} today={today} />)
+            vax.vaccinations.map((v) => <VaccinationRow key={v.id} vaccination={v} today={today} dueSoonDays={dueSoonDays} />)
           )}
           <Button label="Add vaccination" variant="secondary" onPress={() => router.push({ pathname: '/vaccination/new', params: { petId: pet.id } })} />
         </View>
@@ -117,7 +119,7 @@ export default function PetDetailScreen() {
           {care.loaded && care.events.length === 0 ? (
             <Text tone="muted">No reminders yet. Add grooming, medication, flea and tick care or a vet visit.</Text>
           ) : (
-            care.events.map((e) => <CareEventRow key={e.id} event={e} overrides={care.overrides.filter((o) => o.eventId === e.id)} now={now} />)
+            care.events.map((e) => <CareEventRow key={e.id} event={e} overrides={care.overrides.filter((o) => o.eventId === e.id)} now={now} dueSoonDays={dueSoonDays} />)
           )}
           <View style={styles.actions}>
             <Button style={styles.flex} label="Add reminder" variant="secondary" onPress={() => router.push({ pathname: '/care/new', params: { petId: pet.id } })} />

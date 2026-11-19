@@ -9,7 +9,6 @@ import { occurrenceStatus, repeatLabel, summarizeSeries } from '@/core/time/recu
 import { localDateAt } from '@/core/time/localDateTime';
 import { formatOccurrence } from '@/lib/format';
 
-import { DUE_SOON_DAYS } from '../logic/constants';
 
 const TYPE_ICON: Record<CareEvent['type'], IconName> = {
   grooming: 'paw',
@@ -19,11 +18,12 @@ const TYPE_ICON: Record<CareEvent['type'], IconName> = {
   custom: 'calendar',
 };
 
-export function CareEventRow({ event, overrides, now }: { event: CareEvent; overrides: OccurrenceOverride[]; now: number }) {
+export function CareEventRow({ event, overrides, now, dueSoonDays }: { event: CareEvent; overrides: OccurrenceOverride[]; now: number; dueSoonDays: number }) {
   const p = usePalette();
-  const summary = summarizeSeries(event, overrides, localDateAt(now, event.timezoneId), now);
+  const today = localDateAt(now, event.timezoneId);
+  const summary = summarizeSeries(event, overrides, today, now);
   const shown = summary.overdue[0] ?? summary.next;
-  const status = shown ? occurrenceStatus(shown, now, DUE_SOON_DAYS) : null;
+  const status = shown ? occurrenceStatus(shown, now, dueSoonDays, today) : null;
   const when = shown ? formatOccurrence(shown.local, shown.hasExplicitTime) : 'Nothing scheduled';
   const extra = summary.overdue.length > 1 ? ` · ${summary.overdue.length} missed` : '';
 
